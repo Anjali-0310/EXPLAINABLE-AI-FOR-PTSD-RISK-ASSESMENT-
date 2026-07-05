@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindfulnessAI Register</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+
+font-family:'Jost',sans-serif;
+background:#F6F2FD;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+height:100vh;
+margin:0;
+
+}
+
+.register-card{
+
+background:white;
+
+padding:40px;
+
+border-radius:18px;
+
+width:420px;
+
+box-shadow:
+0 25px 70px rgba(45,27,78,0.18);
+
+animation:fadeUp .6s ease;
+
+}
+
+.logo{
+
+display:flex;
+align-items:center;
+gap:12px;
+
+margin-bottom:25px;
+
+}
+
+.logo-text{
+
+font-family:'Cormorant Garamond',serif;
+
+font-size:32px;
+
+}
+
+.logo-text span{
+
+color:#6B3FA0;
+
+}
+
+h2{
+
+margin-bottom:20px;
+font-weight:500;
+
+}
+
+input,select{
+
+width:100%;
+
+padding:12px;
+
+margin-bottom:14px;
+
+border:1px solid #ddd;
+
+border-radius:8px;
+
+font-size:14px;
+
+}
+
+input:focus,select:focus{
+
+outline:none;
+
+border-color:#8B5CC8;
+
+box-shadow:0 0 0 3px rgba(139,92,200,0.15);
+
+}
+
+button{
+
+width:100%;
+
+padding:13px;
+
+background:#6B3FA0;
+
+color:white;
+
+border:none;
+
+border-radius:10px;
+
+font-size:15px;
+
+font-weight:500;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+button:hover{
+
+background:#55308a;
+
+}
+
+.register-footer{
+
+margin-top:18px;
+
+font-size:14px;
+
+text-align:center;
+
+}
+
+.register-footer a{
+
+color:#6B3FA0;
+
+text-decoration:none;
+
+font-weight:500;
+
+}
+
+@keyframes fadeUp{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="register-card">
+
+<div class="logo">
+
+<svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+<circle cx="14" cy="14" r="13" stroke="#6B3FA0" stroke-width="1.5"/>
+<circle cx="14" cy="14" r="7" fill="#6B3FA0" opacity="0.15"/>
+<circle cx="14" cy="14" r="3" fill="#6B3FA0"/>
+</svg>
+
+<div class="logo-text">Mindfulness<span>AI</span></div>
+
+</div>
+
+<h2>Create Account</h2>
+
+<form method="post">
+
+<input type="text" name="name" placeholder="Full name" required>
+
+<input type="email" name="email" placeholder="Email address" required>
+
+<input type="password" name="password" placeholder="Password" required>
+
+<select name="role">
+
+<option value="user">User</option>
+<option value="admin">Admin</option>
+
+</select>
+
+<button type="submit">Create Account</button>
+
+</form>
+
+<div class="register-footer">
+
+Already have an account?
+<a href="/login">Login</a>
+
+</div>
+
+</div>
+
+</body>
+</html>

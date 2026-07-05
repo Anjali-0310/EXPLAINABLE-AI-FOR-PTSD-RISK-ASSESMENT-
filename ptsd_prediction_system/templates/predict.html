@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindfulness PTSD Risk Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   XAI SECTION STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── XAI wrapper ─────────────────────────────────────────── */
+.xai-section-wrap {
+  margin-top: 2.5rem;
+  border-top: 1.5px solid #EDE7F6;
+  padding-top: 2rem;
+}
+.xai-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.35rem;
+}
+.xai-section-heading h3 {
+  font-family: 'Jost', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #2D1B69;
+  margin: 0;
+}
+.xai-icon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #6B3FA0, #9B59B6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.xai-icon svg { width: 17px; height: 17px; stroke: #fff; fill: none; }
+.xai-section-sub {
+  font-size: 0.83rem;
+  color: #7C6FAE;
+  margin-bottom: 1.4rem;
+  line-height: 1.5;
+}
+
+/* ── Consensus box ───────────────────────────────────────── */
+.consensus-box {
+  background: linear-gradient(135deg, #F3EEFF 0%, #EDE7F6 100%);
+  border: 1.5px solid #C4B5FD;
+  border-radius: 14px;
+  padding: 1.1rem 1.4rem;
+  margin-bottom: 1.4rem;
+}
+.consensus-box-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #4C1D95;
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.consensus-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+.consensus-pill {
+  background: #6B3FA0;
+  color: #fff;
+  padding: 0.28rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'Jost', sans-serif;
+}
+.consensus-note {
+  font-size: 0.78rem;
+  color: #6B5EA8;
+  line-height: 1.4;
+}
+
+/* ── XAI tab navigation ──────────────────────────────────── */
+.xai-tabs-nav {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 2px solid #EDE7F6;
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+.xai-tab-btn {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #7C6FAE;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Jost', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: -2px;
+}
+.xai-tab-btn:hover { color: #6B3FA0; background: #F3EEFF; }
+.xai-tab-btn.active {
+  color: #6B3FA0;
+  border-bottom-color: #6B3FA0;
+  background: #FAF8FF;
+}
+.xai-tab-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.dot-shap { background: #1B6CA8; }
+.dot-lime { background: #D97706; }
+.dot-perm { background: #16A34A; }
+
+/* ── XAI tab panels ──────────────────────────────────────── */
+.xai-tab-panel { display: none; }
+.xai-tab-panel.active { display: block; }
+
+/* ── XAI card ────────────────────────────────────────────── */
+.xai-card {
+  background: #FAFAFA;
+  border: 1px solid #EDE7F6;
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 0.5rem;
+}
+.xai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+.xai-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.badge-shap { background: #DBEAFE; color: #1B5EA6; }
+.badge-lime { background: #FEF3C7; color: #92400E; }
+.badge-perm { background: #DCFCE7; color: #166534; }
+.xai-card-title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #2D1B69;
+  margin: 0;
+  font-family: 'Jost', sans-serif;
+}
+.xai-method-note {
+  font-size: 0.77rem;
+  color: #7C6FAE;
+  font-style: italic;
+  margin-bottom: 0.85rem;
+  padding: 0.32rem 0.7rem;
+  background: #F3EEFF;
+  border-left: 3px solid #9B59B6;
+  border-radius: 4px;
+  line-height: 1.45;
+}
+.xai-what {
+  font-size: 0.83rem;
+  color: #555;
+  margin-bottom: 1rem;
+  line-height: 1.55;
+  padding: 0.6rem 0.8rem;
+  background: #F8F8FB;
+  border-radius: 8px;
+  border: 1px solid #EDE7F6;
+}
+.xai-what strong { color: #4C1D95; }
+
+/* ── XAI chart image ─────────────────────────────────────── */
+.xai-plot {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #E8E0F0;
+  background: #fff;
+}
+.xai-plot img {
+  width: 100%;
+  display: block;
+}
+
+/* ── LIME rules list ─────────────────────────────────────── */
+.lime-rules-wrap {
+  margin-top: 1.1rem;
+}
+.lime-rules-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-family: 'Jost', sans-serif;
+}
+.lime-rule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  border-radius: 7px;
+  margin-bottom: 0.38rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+.lime-rule-pos { background: #FEE2E2; }
+.lime-rule-neg { background: #DBEAFE; }
+.lime-rule-text { flex: 1; color: #333; }
+.lime-rule-weight {
+  font-weight: 700;
+  min-width: 62px;
+  text-align: right;
+  margin-left: 0.5rem;
+}
+.lime-weight-pos { color: #B91C1C; }
+.lime-weight-neg { color: #1D4ED8; }
+
+/* ── Permutation table ───────────────────────────────────── */
+.perm-table-wrap { margin-top: 1.1rem; overflow-x: auto; }
+.perm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  font-family: 'Jost', sans-serif;
+}
+.perm-table thead th {
+  background: #1B6CA8;
+  color: #fff;
+  padding: 0.42rem 0.7rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.perm-table tbody td {
+  padding: 0.38rem 0.7rem;
+  border-bottom: 1px solid #EEE;
+}
+.perm-table tbody tr:nth-child(even) { background: #F9F9FB; }
+.perm-val-pos { color: #B91C1C; font-weight: 700; }
+.perm-val-neg { color: #1D4ED8; font-weight: 700; }
+.perm-effect-pos { color: #B91C1C; }
+.perm-effect-neg { color: #1D4ED8; }
+
+/* ── Difference note ─────────────────────────────────────── */
+.xai-diff-note {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 12px;
+  padding: 1rem 1.3rem;
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.6;
+  margin-top: 1.2rem;
+}
+.xai-diff-note strong { color: #D97706; }
+.xai-diff-note .diff-row { margin-bottom: 0.35rem; }
+.xai-diff-heading {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #92400E;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+  <div class="site-header-inner">
+
+    <div class="site-logo">
+      <svg width="42" height="42" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="#6B3FA0" stroke-width="1.5"/>
+        <circle cx="14" cy="14" r="7" fill="#6B3FA0" opacity="0.15"/>
+        <circle cx="14" cy="14" r="3" fill="#6B3FA0"/>
+      </svg>
+      <span class="site-logo-text">Mindfulness<span>AI</span></span>
+    </div>
+
+    <nav class="site-nav">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/dashboard">Patient Records</a>
+      <a href="#" class="nav-active">PTSD Assessment</a>
+      <a href="#">Reports</a>
+    </nav>
+
+    <div class="site-header-right">
+      <div class="header-auth">
+        <a href="#" class="btn-login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Log In
+        </a>
+        <a href="#" class="btn-register">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          Register
+        </a>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-user">
+        <div class="header-avatar">DC</div>
+        <div class="header-user-info">
+          <span class="header-user-name">Dr. Chen</span>
+          <span class="header-user-role">Clinical Psychologist</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<div class="page-wrap">
+<div class="container">
+
+  <!-- LEFT PANEL -->
+  <div class="image-panel">
+    <div class="panel-overlay"></div>
+    <div class="panel-content">
+      <div class="panel-badge">Clinical AI</div>
+      <h1 class="panel-title">Mindfulness</h1>
+      <p class="panel-subtitle">PTSD Risk<br>Prediction System</p>
+      <div class="panel-divider"></div>
+      <p class="panel-note">Evidence-based assessment<br>powered by machine learning</p>
+      <div class="panel-stats">
+        <div class="pstat">
+          <span class="pstat-val">91.2%</span>
+          <span class="pstat-label">Model Accuracy</span>
+        </div>
+        <div class="pstat-divider"></div>
+        <div class="pstat">
+          <span class="pstat-val">4</span>
+          <span class="pstat-label">Risk Levels</span>
+        </div>
+        <div class="pstat-divider"></div>
+        <div class="pstat">
+          <span class="pstat-val">XAI</span>
+          <span class="pstat-label">3 Methods</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-circles">
+      <div class="circle c1"></div>
+      <div class="circle c2"></div>
+      <div class="circle c3"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT DASHBOARD -->
+  <div class="dashboard">
+    <div class="dashboard-inner">
+
+      <div class="header">
+        <div class="header-tag">New Assessment</div>
+        <h1 class="header-title">PTSD Risk Assessment</h1>
+        <p class="header-sub">Complete all fields below for an accurate AI-powered clinical prediction. All data is processed securely.</p>
+      </div>
+
+      <form action="/predict" method="post" class="assessment-form">
+
+        <!-- VITALS -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-number">01</span>
+            <div class="section-header-text">
+              <h3 class="section-title">Vital Parameters</h3>
+              <p class="section-desc">Basic biometric information</p>
+            </div>
+          </div>
+          <div class="grid grid-3">
+            <div class="field">
+              <label>Height (cm)</label>
+              <input type="number" name="Height" placeholder="170">
+            </div>
+            <div class="field">
+              <label>Weight (kg)</label>
+              <input type="number" name="Weight" placeholder="65">
+            </div>
+            <div class="field">
+              <label>Income</label>
+              <input type="number" name="Income" placeholder="3">
+            </div>
+            <div class="field">
+              <label>Education</label>
+              <input type="number" name="Education" placeholder="2">
+            </div>
+            <div class="field">
+              <label for="Age">Age <span class="unit">years</span></label>
+              <input type="number" id="Age" name="Age" placeholder="e.g. 34" min="0" max="120">
+            </div>
+            <div class="field">
+              <label for="BMI">BMI <span class="unit">kg/m²</span></label>
+              <input type="number" id="BMI" name="BMI" placeholder="e.g. 24.5" step="0.1">
+            </div>
+            <div class="field">
+              <label for="psychological_resilience">Psychological Resilience <span class="unit">0–100</span></label>
+              <input type="number" id="psychological_resilience" name="psychological_resilience" placeholder="e.g. 60" min="0" max="100">
+            </div>
+          </div>
+        </div>
+
+        <!-- TRAUMA -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-number">02</span>
+            <div class="section-header-text">
+              <h3 class="section-title">Trauma Exposure</h3>
+              <p class="section-desc">History of traumatic events and exposures</p>
+            </div>
+          </div>
+          <div class="grid grid-3">
+            <div class="field">
+              <label>Recent accident</label>
+              <div class="select-wrap"><select name="recent_accident"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Family accident</label>
+              <div class="select-wrap"><select name="family_accident"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Witnessed serious injury</label>
+              <div class="select-wrap"><select name="witnessed_serious_injury"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Witnessed corpse</label>
+              <div class="select-wrap"><select name="witnessed_corpse"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Traumatic scene</label>
+              <div class="select-wrap"><select name="traumatic_scene"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEDICAL -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-number">03</span>
+            <div class="section-header-text">
+              <h3 class="section-title">Medical &amp; Lifestyle</h3>
+              <p class="section-desc">Clinical history and lifestyle risk factors</p>
+            </div>
+          </div>
+          <div class="grid grid-4">
+            <div class="field">
+              <label>Psychiatric history</label>
+              <div class="select-wrap"><select name="psychiatric_history"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Medication use</label>
+              <div class="select-wrap"><select name="medication_use"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Smoking history</label>
+              <div class="select-wrap"><select name="smoking_history"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+            <div class="field">
+              <label>Alcohol use</label>
+              <div class="select-wrap"><select name="alcohol_use"><option value="0">No</option><option value="1">Yes</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="predict-btn">
+          <span class="btn-text">Run Risk Prediction</span>
+          <svg class="btn-arrow" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+      </form>
+
+      <!-- ═══════════════════════════════════════════════════
+           RESULT SECTION
+           ═══════════════════════════════════════════════════ -->
+      {% if prediction_text %}
+      <div class="result-section">
+        <div class="result-divider">
+          <div class="result-divider-line"></div>
+          <span class="result-divider-label">Assessment Result</span>
+          <div class="result-divider-line"></div>
+        </div>
+
+        <!-- ── Risk card (original) ──────────────────────── -->
+        <div class="result-card {{ gauge_class }}">
+          <div class="result-top">
+            <div class="result-label-row">
+              <span class="result-label">AI Clinical Analysis</span>
+              <span class="result-badge {{ gauge_class }}">{{ gauge_class | replace('-', ' ') | title }}</span>
+            </div>
+            <h2 class="result-heading">{{ prediction_text }}</h2>
+            <p class="result-note">Based on the clinical parameters provided, the AI model has computed the probability score shown. This is an assistive tool — consult a qualified clinician for final interpretation.</p>
+          </div>
+
+          <div class="result-bottom">
+            <div class="result-ring-wrap">
+              <div class="risk-ring {{ gauge_class }}">
+                <svg viewBox="0 0 180 180" class="ring-svg">
+                  <circle cx="90" cy="90" r="78" class="ring-track"/>
+                  <circle cx="90" cy="90" r="78" class="ring-fill" id="ring-fill-circle" style="stroke-dashoffset: 490;"/>
+                </svg>
+                <div class="ring-inner">
+                  <span class="ring-value">{{ probability }}%</span>
+                  <span class="ring-caption">PTSD probability</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-meta">
+              <div class="meta-item">
+                <span class="meta-label">Risk Level</span>
+                <span class="meta-value risk-text-{{ gauge_class }}">{{ gauge_class | replace('-', ' ') | title }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Probability Score</span>
+                <span class="meta-value">{{ probability }}% likelihood of PTSD</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Clinical Recommendation</span>
+                <span class="meta-value rec-text">
+                  {% if gauge_class == 'low-risk' %}Routine follow-up in 6 months. No immediate intervention required.
+                  {% elif gauge_class == 'moderate-risk' %}Structured psychological evaluation within 4 weeks. Consider trauma-focused CBT.
+                  {% elif gauge_class == 'high-risk' %}Specialist referral strongly advised within 1 week. Initiate trauma-informed care protocol.
+                  {% else %}Immediate clinical intervention required. Schedule urgent assessment with a trauma specialist.{% endif %}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Model</span>
+                <span class="meta-value">Mindfulness AI v2.4 — Hybrid ML + Clinical Score</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Original SHAP bar list (kept for backward compat) -->
+          {% if explanations %}
+          <div class="result-shap">
+            <div class="shap-header">
+              <span class="shap-title">Top Contributing Factors</span>
+              <span class="shap-subtitle">SHAP-based feature importance</span>
+            </div>
+            <div class="shap-list">
+              {% for exp in explanations %}
+              <div class="shap-row">
+                <span class="shap-name">{{ exp.feature | replace('_', ' ') | title }}</span>
+                <div class="shap-bar-wrap">
+                  <div class="shap-bar {{ exp.effect | replace(' ', '-') }} {{ exp.bar_size }}"></div>
+                </div>
+                <span class="shap-tag {{ exp.effect | replace(' ', '-') }}">{{ exp.effect }}</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+        </div><!-- end result-card -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             XAI EXPLANATION SECTION
+             3 methods: SHAP + LIME + Permutation
+             Appears below the risk card after prediction
+             ═══════════════════════════════════════════════ -->
+        {% if shap_plot or lime_plot or perm_plot %}
+        <div class="xai-section-wrap">
+
+          <!-- Section heading -->
+          <div class="xai-section-heading">
+            <div class="xai-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <h3>Why This Risk Score? — AI Explanation</h3>
+          </div>
+          <p class="xai-section-sub">
+            Three independent methods explain the {{ probability }}% PTSD risk prediction.
+            When all three agree on a feature — that finding is medically robust and trustworthy.
+          </p>
+
+          <!-- Consensus box -->
+          {% if consensus_top3 %}
+          <div class="consensus-box">
+            <div class="consensus-box-title">
+              ✅ Key Drivers — All 3 Methods Agree
+            </div>
+            <div class="consensus-pills">
+              {% for feat in consensus_top3 %}
+              <span class="consensus-pill">{{ loop.index }}. {{ feat | replace('_', ' ') | title }}</span>
+              {% endfor %}
+            </div>
+            <p class="consensus-note">
+              These features were consistently ranked most important across SHAP, LIME,
+              and Permutation Importance — indicating a robust clinical signal.
+            </p>
+          </div>
+          {% endif %}
+
+          <!-- Tab navigation -->
+          <div class="xai-tabs-nav">
+            <button class="xai-tab-btn active" onclick="showXaiTab('shap', this)">
+              <span class="xai-tab-dot dot-shap"></span>SHAP
+            </button>
+            <button class="xai-tab-btn" onclick="showXaiTab('lime', this)">
+              <span class="xai-tab-dot dot-lime"></span>LIME
+            </button>
+            <button class="xai-tab-btn" onclick="showXaiTab('perm', this)">
+              <span class="xai-tab-dot dot-perm"></span>Permutation
+            </button>
+          </div>
+
+          <!-- ── TAB 1: SHAP ─────────────────────────────── -->
+          <div id="xai-tab-shap" class="xai-tab-panel active">
+            <div class="xai-card">
+              <div class="xai-card-header">
+                <span class="xai-badge badge-shap">SHAP</span>
+                <h4 class="xai-card-title">Mathematical Feature Attribution</h4>
+              </div>
+
+              {% if shap_method %}
+              <div class="xai-method-note">
+                ⚙ Method: {{ shap_method }}
+              </div>
+              {% endif %}
+
+              <div class="xai-what">
+                <strong>What this shows:</strong> Each bar shows the exact mathematical contribution
+                of one feature to the {{ probability }}% PTSD risk score.
+                <strong style="color:#C62828;">Red bars push risk UP.</strong>
+                <strong style="color:#1B6CA8;">Blue bars push risk DOWN.</strong>
+                A longer bar means stronger influence on this specific patient's prediction.
+              </div>
+
+              {% if shap_plot %}
+              <div class="xai-plot">
+                <img src="{{ shap_plot }}" alt="SHAP Feature Contributions">
+              </div>
+              {% else %}
+              <p style="color:#999;font-size:0.85rem;padding:1rem;">SHAP chart unavailable.</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- ── TAB 2: LIME ─────────────────────────────── -->
+          <div id="xai-tab-lime" class="xai-tab-panel">
+            <div class="xai-card">
+              <div class="xai-card-header">
+                <span class="xai-badge badge-lime">LIME</span>
+                <h4 class="xai-card-title">Local Rule-Based Explanation</h4>
+              </div>
+
+              {% if lime_method %}
+              <div class="xai-method-note">
+                ⚙ Method: {{ lime_method }}
+              </div>
+              {% endif %}
+
+              <div class="xai-what">
+                <strong>What this shows:</strong> LIME builds a simple local model around
+                this patient by testing 2,000 similar but slightly different patients.
+                Each rule (e.g. <em>"psychiatric_history &gt; 0.5"</em>) shows how strongly
+                it <strong style="color:#C62828;">supports</strong> or
+                <strong style="color:#1B6CA8;">contradicts</strong> the PTSD prediction.
+              </div>
+
+              {% if lime_plot %}
+              <div class="xai-plot">
+                <img src="{{ lime_plot }}" alt="LIME Rule-Based Explanation">
+              </div>
+              {% else %}
+              <p style="color:#999;font-size:0.85rem;padding:1rem;">LIME chart unavailable.</p>
+              {% endif %}
+
+              <!-- LIME rules in plain English -->
+              {% if lime_data %}
+              <div class="lime-rules-wrap">
+                <div class="lime-rules-title">📋 Top Rules — Plain English:</div>
+                {% for row in lime_data[:7] %}
+                <div class="lime-rule-row {{ 'lime-rule-pos' if row.weight > 0 else 'lime-rule-neg' }}">
+                  <span class="lime-rule-text">{{ row.rule }}</span>
+                  <span class="lime-rule-weight {{ 'lime-weight-pos' if row.weight > 0 else 'lime-weight-neg' }}">
+                    {{ "+" if row.weight > 0 else "" }}{{ "%.3f" | format(row.weight) }}
+                  </span>
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+
+          <!-- ── TAB 3: PERMUTATION ──────────────────────── -->
+          <div id="xai-tab-perm" class="xai-tab-panel">
+            <div class="xai-card">
+              <div class="xai-card-header">
+                <span class="xai-badge badge-perm">Permutation</span>
+                <h4 class="xai-card-title">Feature Dependency — What the Model Relies On</h4>
+              </div>
+
+              {% if perm_method %}
+              <div class="xai-method-note">
+                ⚙ Method: {{ perm_method }}
+              </div>
+              {% endif %}
+
+              <div class="xai-what">
+                <strong>What this shows:</strong> Each feature is temporarily removed
+                (set to zero) and the change in PTSD probability is measured.
+                A large <strong style="color:#C62828;">red bar</strong> means the model
+                depended heavily on that feature — removing it would significantly change
+                the {{ probability }}% risk score.
+              </div>
+
+              {% if perm_plot %}
+              <div class="xai-plot">
+                <img src="{{ perm_plot }}" alt="Permutation Importance">
+              </div>
+              {% else %}
+              <p style="color:#999;font-size:0.85rem;padding:1rem;">Permutation chart unavailable.</p>
+              {% endif %}
+
+              <!-- Permutation data table -->
+              {% if perm_data %}
+              <div class="perm-table-wrap">
+                <table class="perm-table">
+                  <thead>
+                    <tr>
+                      <th>Feature</th>
+                      <th>Δ Probability</th>
+                      <th>Effect on Risk</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in perm_data %}
+                    <tr>
+                      <td><strong>{{ row.feature | replace('_', ' ') | title }}</strong></td>
+                      <td class="{{ 'perm-val-pos' if row.delta > 0 else 'perm-val-neg' }}">
+                        {{ "+" if row.delta > 0 else "" }}{{ "%.4f" | format(row.delta) }}
+                      </td>
+                      <td class="{{ 'perm-effect-pos' if row.delta > 0 else 'perm-effect-neg' }}">
+                        {{ row.effect }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+
+          <!-- Why methods differ note -->
+          <div class="xai-diff-note">
+            <span class="xai-diff-heading">⚠ Why might the three methods give different rankings?</span>
+            <div class="diff-row">
+              <strong>🔵 SHAP</strong> computes the mathematically exact contribution of each
+              feature considering all possible orderings — captures interaction effects between features.
+            </div>
+            <div class="diff-row">
+              <strong>🟡 LIME</strong> builds a simple local linear model — may miss complex
+              non-linear effects but gives human-readable IF-THEN rules.
+            </div>
+            <div class="diff-row">
+              <strong>🟢 Permutation</strong> tests the model directly by removing features —
+              model-agnostic, but does not capture interaction effects like SHAP.
+            </div>
+            <div style="margin-top:0.6rem;padding-top:0.5rem;border-top:1px solid #FDE68A;">
+              When all three <strong>agree</strong> on a feature → high-confidence clinical finding. &nbsp;
+              When they <strong>differ</strong> → the feature has non-linear or interaction effects
+              worth noting to the clinician.
+            </div>
+          </div>
+
+        </div><!-- end xai-section-wrap -->
+        {% endif %}<!-- end if shap_plot or lime_plot or perm_plot -->
+
+      </div><!-- end result-section -->
+
+      <script>
+        // Animate probability ring
+        var prob = {{ probability }};
+        var offset = 490 - (490 * prob / 100);
+        document.getElementById('ring-fill-circle').style.strokeDashoffset = offset;
+
+        // XAI tab switcher
+        function showXaiTab(name, btn) {
+          document.querySelectorAll('.xai-tab-panel').forEach(function(p) {
+            p.classList.remove('active');
+          });
+          document.querySelectorAll('.xai-tab-btn').forEach(function(b) {
+            b.classList.remove('active');
+          });
+          document.getElementById('xai-tab-' + name).classList.add('active');
+          btn.classList.add('active');
+        }
+      </script>
+      {% endif %}<!-- end if prediction_text -->
+
+    </div><!-- end dashboard-inner -->
+  </div><!-- end dashboard -->
+
+</div><!-- end container -->
+</div><!-- end page-wrap -->
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-left">
+      <div class="footer-logo">
+        <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#A87FD8" stroke-width="1.5"/>
+          <circle cx="14" cy="14" r="7" fill="#A87FD8" opacity="0.2"/>
+          <circle cx="14" cy="14" r="3" fill="#A87FD8"/>
+        </svg>
+        MindfulnessAI
+      </div>
+      <p class="footer-disclaimer">This tool is intended for clinical assistance only and does not constitute a medical diagnosis. Always consult a qualified mental health professional before making any clinical decisions.</p>
+    </div>
+
+    <div class="footer-right">
+      <div class="footer-auth">
+        <a href="#" class="footer-btn-login">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Log In
+        </a>
+        <a href="#" class="footer-btn-register">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          Register
+        </a>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Clinical Guidelines</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">&copy; 2025 MindfulnessAI. All rights reserved.</p>
+    <p class="footer-hipaa">HIPAA COMPLIANT &nbsp;·&nbsp; ISO 27001 CERTIFIED &nbsp;·&nbsp; SOC 2 TYPE II</p>
+  </div>
+</footer>
+
+</body>
+</html>

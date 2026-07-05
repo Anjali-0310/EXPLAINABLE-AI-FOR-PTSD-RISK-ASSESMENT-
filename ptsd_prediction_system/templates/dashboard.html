@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MindfulnessAI — PTSD Risk Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════
+   TOKENS
+═══════════════════════════════ */
+:root {
+  --plum:     #2d2050;
+  --plum2:    #3d2d6e;
+  --plum3:    #52409a;
+  --violet:   #7c5cbf;
+  --lav:      #b0a0e0;
+  --lilac:    #ede8f8;
+  --lilac2:   #f5f2fd;
+  --ink:      #12101e;
+  --ink2:     #2e2845;
+  --ink3:     #6b6485;
+  --ink4:     #9890b0;
+  --cream:    #f6f4f0;
+  --cream2:   #edeae3;
+  --white:    #ffffff;
+  --rose:     #be3358;
+  --rose-bg:  #fdf0f3;
+  --amber:    #c4711a;
+  --amber-bg: #fdf5ec;
+  --sage:     #2b8a62;
+  --sage-bg:  #eef7f3;
+  --border:   #e2daf2;
+  --border2:  #ccc4e8;
+  --sh1: 0 1px 4px rgba(30,20,70,.07);
+  --sh2: 0 6px 24px rgba(30,20,70,.10);
+  --sh3: 0 12px 40px rgba(30,20,70,.14);
+  --r:  14px;
+  --r2: 20px;
+}
+ 
+/* ═══════════════════════════════
+   RESET
+═══════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+button, input, select { font: inherit; cursor: pointer; }
+ 
+/* ═══════════════════════════════
+   ANIMATIONS
+═══════════════════════════════ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:.3} }
+.a1{animation:fadeUp .6s .05s both}
+.a2{animation:fadeUp .6s .15s both}
+.a3{animation:fadeUp .6s .25s both}
+.a4{animation:fadeUp .6s .35s both}
+.a5{animation:fadeUp .6s .45s both}
+ 
+/* ═══════════════════════════════
+   BUTTONS
+═══════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: .55rem;
+  padding: .75rem 1.6rem;
+  border-radius: 10px;
+  font-size: 1rem; font-weight: 600; letter-spacing: .01em;
+  border: none; cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; flex-shrink: 0; }
+.btn-primary { background: var(--plum); color: #fff; }
+.btn-primary:hover { background: var(--plum2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(45,32,80,.3); }
+.btn-outline { background: transparent; border: 1.5px solid var(--border2); color: var(--ink2); }
+.btn-outline:hover { border-color: var(--violet); color: var(--violet); }
+.btn-ghost { background: transparent; color: var(--ink3); padding: .65rem 1.1rem; }
+.btn-ghost:hover { color: var(--plum); background: var(--lilac); }
+ 
+/* ═══════════════════════════════
+   STRIP
+═══════════════════════════════ */
+.strip {
+  background: linear-gradient(90deg, var(--plum) 0%, var(--plum3) 55%, var(--violet) 100%);
+  color: rgba(255,255,255,.88);
+  text-align: center;
+  padding: .7rem 1.5rem;
+  font-size: .95rem;
+}
+.strip strong { color: #fff; }
+.strip a { color: var(--lav); text-decoration: underline; text-underline-offset: 3px; }
+.strip a:hover { color: #fff; }
+ 
+/* ═══════════════════════════════
+   HEADER
+═══════════════════════════════ */
+header.site-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 300;
+  box-shadow: var(--sh1);
+}
+.header-inner {
+  width: 100%;
+  padding: 0 3.5rem;
+  height: 76px;
+  display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+}
+ 
+/* Logo */
+.logo { display: flex; align-items: center; gap: .9rem; flex-shrink: 0; }
+.logo-mark {
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, var(--plum), var(--violet));
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(45,32,80,.35); flex-shrink: 0;
+}
+.logo-mark svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 1.8; }
+.logo-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; line-height: 1.1;
+}
+.logo-name span { color: var(--violet); }
+.logo-sub { font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink4); margin-top: 2px; }
+ 
+/* Primary nav */
+nav.primary-nav { display: flex; align-items: center; gap: .3rem; }
+.nav-link {
+  padding: .65rem 1.2rem;
+  border-radius: 10px;
+  font-size: 1rem; font-weight: 500; color: var(--ink3);
+  transition: all .18s; position: relative;
+}
+.nav-link:hover { color: var(--plum); background: var(--lilac); }
+.nav-link.active { color: var(--plum); font-weight: 700; background: var(--lilac); }
+.nav-link.active::after {
+  content: ''; position: absolute; bottom: -1px; left: 1.2rem; right: 1.2rem;
+  height: 2.5px; background: var(--violet); border-radius: 2px;
+}
+ 
+/* Header right */
+.header-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+.user-chip {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .45rem 1.1rem .45rem .5rem;
+  background: var(--lilac); border: 1px solid var(--border);
+  border-radius: 50px; cursor: pointer; transition: box-shadow .2s;
+}
+.user-chip:hover { box-shadow: 0 0 0 3px var(--border2); }
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--plum), var(--violet));
+  color: #fff; font-size: .9rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-name { font-size: .95rem; font-weight: 700; color: var(--ink); line-height: 1.25; }
+.user-role { font-size: .78rem; color: var(--ink4); }
+ 
+/* ═══════════════════════════════
+   HERO
+═══════════════════════════════ */
+.hero {
+  background: linear-gradient(140deg, var(--plum) 0%, #221645 45%, #170f35 100%);
+  position: relative; overflow: hidden;
+  padding: 5.5rem 3.5rem 6rem;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.018'%3E%3Cpath d='M48 46v-6h-2v6h-6v2h6v6h2v-6h6v-2h-6zm0-40V0h-2v6h-6v2h6v6h2V8h6V6h-6zM8 46v-6H6v6H0v2h6v6h2v-6h6v-2H8zM8 6V0H6v6H0v2h6v6h2V8h6V6H8z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.hb1 { width: 650px; height: 650px; background: rgba(124,92,191,.2); top: -160px; right: -80px; }
+.hb2 { width: 420px; height: 420px; background: rgba(176,160,224,.1); bottom: -130px; left: 4%; }
+.hb3 { width: 350px; height: 350px; background: rgba(100,60,200,.1); top: 15%; left: 32%; }
+ 
+.hero-inner {
+  width: 100%; max-width: 1400px; margin: 0 auto;
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 320px; gap: 4rem; align-items: center;
+}
+ 
+/* Hero left */
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: .55rem;
+  background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50px; padding: .4rem 1.1rem;
+  font-size: .9rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--lav); margin-bottom: 1.4rem;
+}
+.hero-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--lav); animation: pulse 2s infinite; flex-shrink: 0; }
+ 
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 4.5vw, 3.75rem);
+  font-weight: 700; line-height: 1.08; letter-spacing: -.025em;
+  color: #fff; margin-bottom: 1.2rem;
+}
+.hero-title em { font-style: italic; color: var(--lav); }
+ 
+.hero-desc {
+  font-size: 1.1rem; line-height: 1.75;
+  color: rgba(255,255,255,.6); max-width: 580px; margin-bottom: 2.2rem;
+}
+ 
+.hero-actions { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+.hero-btn-p {
+  display: inline-flex; align-items: center; gap: .55rem;
+  padding: .85rem 2rem; background: #fff; color: var(--plum);
+  border-radius: 11px; font-size: 1rem; font-weight: 700;
+  transition: all .2s; border: none; cursor: pointer;
+}
+.hero-btn-p:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,.22); }
+.hero-btn-p svg { width: 18px; height: 18px; stroke: var(--plum); fill: none; stroke-width: 2.5; }
+.hero-btn-o {
+  display: inline-flex; align-items: center; gap: .55rem;
+  padding: .85rem 2rem; background: transparent;
+  color: rgba(255,255,255,.85); border: 1.5px solid rgba(255,255,255,.25);
+  border-radius: 11px; font-size: 1rem; font-weight: 700;
+  transition: all .2s; cursor: pointer;
+}
+.hero-btn-o:hover { border-color: rgba(255,255,255,.55); color: #fff; }
+ 
+/* Hero stats */
+.hero-stats {
+  display: flex; gap: 2.5rem; flex-wrap: wrap;
+  margin-top: 2.8rem; padding-top: 2.8rem;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.hs-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.6rem; font-weight: 700; color: #fff; line-height: 1;
+}
+.hs-val sup { font-size: 1.1rem; }
+.hs-lbl { font-size: .9rem; color: rgba(255,255,255,.5); margin-top: .3rem; letter-spacing: .02em; }
+ 
+/* Hero card */
+.hero-card {
+  background: rgba(255,255,255,.07); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.12); border-radius: var(--r2);
+  padding: 2rem; box-shadow: 0 24px 64px rgba(0,0,0,.3);
+}
+.hc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.6rem; }
+.hc-title { font-size: .9rem; font-weight: 700; color: rgba(255,255,255,.65); letter-spacing: .05em; text-transform: uppercase; }
+.live-dot { display: flex; align-items: center; gap: .4rem; font-size: .82rem; color: rgba(255,255,255,.45); }
+.live-dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #4caf8a; animation: pulse 1.5s infinite; }
+.hc-donut {
+  width: 130px; height: 130px; border-radius: 50%;
+  background: conic-gradient(var(--violet) 0% 68%, rgba(255,255,255,.1) 68%);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.6rem; position: relative;
+}
+.hc-donut::after { content: ''; position: absolute; width: 86px; height: 86px; border-radius: 50%; background: rgba(36,26,64,.92); }
+.hc-donut-val { position: relative; z-index: 1; font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #fff; }
+.hc-rows { display: flex; flex-direction: column; gap: .75rem; }
+.hc-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.hc-lbl { font-size: .88rem; color: rgba(255,255,255,.5); }
+.hc-val { font-size: .88rem; font-weight: 700; color: #fff; }
+.mpill { padding: .2rem .65rem; border-radius: 12px; font-size: .78rem; font-weight: 700; }
+.mpill-g { background: rgba(76,175,138,.2); color: #72cfaa; border: 1px solid rgba(76,175,138,.25); }
+ 
+/* ═══════════════════════════════
+   BREADCRUMB
+═══════════════════════════════ */
+.bc-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: .75rem 3.5rem; }
+.bc { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: .45rem; font-size: .9rem; color: var(--ink3); }
+.bc a { color: var(--violet); font-weight: 500; }
+.bc a:hover { text-decoration: underline; }
+.bc-sep { color: var(--border2); font-size: 1rem; }
+ 
+/* ═══════════════════════════════
+   PAGE LAYOUT
+═══════════════════════════════ */
+.page-outer { padding: 3rem 3.5rem 5rem; }
+.page-inner { width: 100%; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 310px 1fr; gap: 2.5rem; align-items: start; }
+ 
+/* ═══════════════════════════════
+   SIDEBAR
+═══════════════════════════════ */
+.sidebar { display: flex; flex-direction: column; gap: 1.4rem; position: sticky; top: 96px; }
+ 
+.sc {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--sh1); overflow: hidden;
+}
+.sc-head {
+  padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: .6rem;
+}
+.sc-head svg { width: 17px; height: 17px; stroke: var(--violet); fill: none; stroke-width: 2; flex-shrink: 0; }
+.sc-head h3 { font-size: .95rem; font-weight: 700; color: var(--ink); }
+.sc-body { padding: 1.5rem; }
+ 
+/* Model ring */
+.mring-wrap { text-align: center; margin-bottom: 1.4rem; }
+.mring {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: conic-gradient(var(--violet) 0% 91.2%, var(--border) 91.2%);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto .85rem; position: relative;
+}
+.mring::after { content: ''; position: absolute; width: 82px; height: 82px; border-radius: 50%; background: var(--white); }
+.mring-val { position: relative; z-index: 1; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--plum); }
+.mring-lbl { font-size: .9rem; font-weight: 700; color: var(--ink); margin-bottom: .25rem; }
+.mring-sub { font-size: .82rem; color: var(--ink3); }
+ 
+.mrow { display: flex; align-items: center; justify-content: space-between; padding: .5rem 0; border-bottom: 1px solid var(--border); }
+.mrow:last-child { border-bottom: none; }
+.mrow-n { font-size: .9rem; color: var(--ink3); }
+.mrow-v { font-size: .9rem; font-weight: 700; color: var(--ink); font-family: 'Inter', monospace; }
+ 
+/* Dist bars */
+.dist-list { display: flex; flex-direction: column; gap: 1rem; }
+.dist-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+.dist-name { font-size: .92rem; font-weight: 700; color: var(--ink2); }
+.dist-count { font-size: .85rem; color: var(--ink3); }
+.dist-track { height: 7px; background: var(--cream2); border-radius: 4px; overflow: hidden; }
+.dist-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.df-h { background: linear-gradient(90deg, var(--rose), #e87a9c); }
+.df-m { background: linear-gradient(90deg, var(--amber), #f0c070); }
+.df-l { background: linear-gradient(90deg, var(--sage), #72cfaa); }
+ 
+/* Info box */
+.info-box { background: var(--lilac); border: 1px solid var(--border); border-radius: var(--r); padding: 1.1rem 1.25rem; }
+.info-tag {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: var(--plum); color: #fff;
+  font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: .28rem .7rem; border-radius: 50px; margin-bottom: .65rem;
+}
+.info-box p { font-size: .9rem; line-height: 1.7; color: var(--ink2); }
+.info-box strong { color: var(--plum); }
+ 
+/* Quick links */
+.ql { display: flex; flex-direction: column; gap: .3rem; }
+.ql-a {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .72rem .9rem; border-radius: 9px;
+  font-size: .95rem; color: var(--ink2); transition: all .15s;
+}
+.ql-a:hover { background: var(--lilac); color: var(--plum); }
+.ql-a svg { width: 17px; height: 17px; stroke: var(--ink3); fill: none; stroke-width: 2; flex-shrink: 0; }
+.ql-a:hover svg { stroke: var(--violet); }
+ 
+/* ═══════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════ */
+.content-area { display: flex; flex-direction: column; gap: 2rem; }
+ 
+/* Page heading */
+.pg-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+.pg-tag {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--violet); background: var(--lilac); border: 1px solid var(--border);
+  padding: .32rem .9rem; border-radius: 50px; margin-bottom: .65rem;
+}
+.pg-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
+.pg-head h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.75rem, 2.5vw, 2.5rem);
+  font-weight: 700; line-height: 1.18; letter-spacing: -.02em;
+}
+.pg-desc { font-size: 1rem; color: var(--ink3); margin-top: .4rem; max-width: 560px; line-height: 1.7; }
+.pg-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+ 
+/* Summary cards */
+.sum-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+.sum-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1.5rem 1.6rem;
+  box-shadow: var(--sh1); transition: box-shadow .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.sum-card:hover { box-shadow: var(--sh2); transform: translateY(-2px); }
+.sum-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3.5px; }
+.c-tot::before { background: var(--violet); }
+.c-hi::before  { background: var(--rose); }
+.c-me::before  { background: var(--amber); }
+.c-lo::before  { background: var(--sage); }
+ 
+.sum-icon { width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+.sum-icon svg { width: 20px; height: 20px; fill: none; stroke-width: 2; }
+.i-plum { background: var(--lilac); } .i-plum svg { stroke: var(--violet); }
+.i-rose { background: var(--rose-bg); } .i-rose svg { stroke: var(--rose); }
+.i-amb  { background: var(--amber-bg); } .i-amb svg { stroke: var(--amber); }
+.i-sag  { background: var(--sage-bg); } .i-sag svg { stroke: var(--sage); }
+ 
+.sum-num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; line-height: 1; color: var(--ink); margin-bottom: .3rem; }
+.sum-lbl { font-size: .95rem; font-weight: 700; color: var(--ink2); }
+.sum-sub { font-size: .85rem; color: var(--ink3); margin-top: .25rem; }
+ 
+/* Table card */
+.tc {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--sh1); overflow: hidden;
+}
+.tc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.4rem 1.8rem; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 1rem;
+}
+.tc-title { display: flex; align-items: center; gap: .7rem; }
+.tc-title svg { width: 18px; height: 18px; stroke: var(--violet); fill: none; stroke-width: 2; }
+.tc-title h3 { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.tc-badge {
+  background: var(--lilac); color: var(--violet);
+  border: 1px solid var(--border); border-radius: 50px;
+  font-size: .82rem; font-weight: 700; padding: .22rem .75rem;
+}
+.tc-actions { display: flex; align-items: center; gap: .6rem; }
+ 
+.search-box {
+  display: flex; align-items: center; gap: .55rem;
+  background: var(--cream); border: 1.5px solid var(--border);
+  border-radius: 9px; padding: .5rem 1rem;
+  transition: border-color .2s;
+}
+.search-box:focus-within { border-color: var(--violet); }
+.search-box svg { width: 15px; height: 15px; stroke: var(--ink3); fill: none; stroke-width: 2; flex-shrink: 0; }
+.search-box input { background: transparent; border: none; outline: none; font-size: .95rem; color: var(--ink); width: 180px; }
+.search-box input::placeholder { color: var(--ink4); }
+ 
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--cream); }
+th {
+  padding: 1rem 1.8rem; text-align: left;
+  font-size: .8rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--ink3); border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+th.sort { cursor: pointer; user-select: none; }
+th.sort:hover { color: var(--violet); }
+td { padding: 1.1rem 1.8rem; font-size: 1rem; color: var(--ink); border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr { transition: background .12s; }
+tbody tr:hover { background: rgba(124,92,191,.035); }
+tbody tr:last-child td { border-bottom: none; }
+ 
+.ci { font-size: .85rem; color: var(--ink3); font-weight: 600; font-variant-numeric: tabular-nums; }
+.cd .dm { font-weight: 600; font-size: .98rem; }
+.cd .dt { font-size: .82rem; color: var(--ink3); display: block; margin-top: 2px; }
+ 
+/* Risk cell */
+.rcell { display: flex; align-items: center; gap: .9rem; }
+.rpct { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; min-width: 4rem; }
+.rbar { flex: 1; height: 6px; background: var(--cream2); border-radius: 3px; overflow: hidden; max-width: 110px; }
+.rbar-fill { height: 100%; border-radius: 3px; transition: width .8s .2s cubic-bezier(.4,0,.2,1); }
+.ch { color: var(--rose); } .cm { color: var(--amber); } .cl { color: var(--sage); }
+.bh { background: var(--rose); } .bm { background: var(--amber); } .bl { background: var(--sage); }
+ 
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .38rem 1rem; border-radius: 50px;
+  font-size: .85rem; font-weight: 700; white-space: nowrap;
+}
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.badge-high { background: var(--rose-bg); color: var(--rose); border: 1px solid rgba(190,51,88,.2); } .badge-high::before { background: var(--rose); }
+.badge-low  { background: var(--sage-bg); color: var(--sage); border: 1px solid rgba(43,138,98,.2); } .badge-low::before { background: var(--sage); }
+.badge-medium, .badge-moderate { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(196,113,26,.2); } .badge-medium::before, .badge-moderate::before { background: var(--amber); }
+ 
+/* Row actions */
+.row-acts { display: flex; align-items: center; gap: .3rem; opacity: 0; transition: opacity .15s; }
+tbody tr:hover .row-acts { opacity: 1; }
+.ib { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; }
+.ib svg { width: 15px; height: 15px; stroke: var(--ink3); fill: none; stroke-width: 2; }
+.ib:hover { background: var(--lilac); border-color: var(--border2); } .ib:hover svg { stroke: var(--violet); }
+ 
+/* Table foot */
+.tc-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 1.8rem; border-top: 1px solid var(--border);
+  background: var(--cream); flex-wrap: wrap; gap: .9rem;
+}
+.tc-foot-info { font-size: .9rem; color: var(--ink3); }
+.pgn { display: flex; align-items: center; gap: .4rem; }
+.pgn-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: .9rem; font-weight: 700; color: var(--ink3); transition: all .15s;
+}
+.pgn-btn:hover, .pgn-btn.active { background: var(--plum); color: #fff; border-color: var(--plum); }
+.pgn-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+ 
+/* Empty state */
+.empty { padding: 5.5rem 2rem; text-align: center; }
+.empty-ico { width: 72px; height: 72px; border-radius: 50%; background: var(--lilac); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.4rem; }
+.empty-ico svg { width: 32px; height: 32px; stroke: var(--violet); fill: none; stroke-width: 1.5; }
+.empty h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: .6rem; color: var(--ink); }
+.empty p { font-size: 1rem; color: var(--ink3); margin-bottom: 1.6rem; max-width: 360px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+ 
+/* ═══════════════════════════════
+   RESEARCH SECTION
+═══════════════════════════════ */
+.research { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); padding: 2.2rem 2.4rem; box-shadow: var(--sh1); }
+.rg { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; margin-top: 1.75rem; }
+.rb h3 { font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: .75rem; display: flex; align-items: center; gap: .55rem; }
+.rb h3 svg { width: 17px; height: 17px; stroke: var(--violet); fill: none; stroke-width: 2; }
+.rb p { font-size: .97rem; line-height: 1.75; color: var(--ink3); }
+.feat-list { display: flex; flex-direction: column; gap: .55rem; margin-top: .75rem; }
+.feat-item { display: flex; align-items: center; gap: .65rem; font-size: .95rem; color: var(--ink2); }
+.feat-item::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--violet); flex-shrink: 0; }
+.shap-list { display: flex; flex-direction: column; gap: .7rem; margin-top: .75rem; }
+.shap-head { display: flex; justify-content: space-between; margin-bottom: .35rem; }
+.shap-name { font-size: .92rem; font-weight: 700; color: var(--ink2); }
+.shap-score { font-size: .88rem; color: var(--ink3); }
+.shap-track { height: 6px; background: var(--cream2); border-radius: 3px; overflow: hidden; }
+.shap-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--violet), var(--lav)); }
+ 
+/* ═══════════════════════════════
+   FOOTER
+═══════════════════════════════ */
+footer.sf { background: var(--ink); color: rgba(255,255,255,.55); padding: 5rem 3.5rem 2.5rem; margin-top: 0; }
+.fi { max-width: 1400px; margin: 0 auto; }
+.ft { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+.fb .logo-name { color: #fff; font-size: 1.3rem; }
+.fb .logo-name span { color: var(--lav); }
+.fb-tag { font-size: .95rem; color: rgba(255,255,255,.42); line-height: 1.7; margin-top: .85rem; max-width: 290px; }
+.fb-badge { display: inline-flex; align-items: center; gap: .42rem; background: rgba(124,92,191,.18); border: 1px solid rgba(124,92,191,.28); color: var(--lav); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .28rem .78rem; border-radius: 50px; margin-top: 1.1rem; }
+.fc h4 { font-size: .85rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 1.1rem; }
+.fc ul { display: flex; flex-direction: column; gap: .6rem; }
+.fc ul li a { font-size: .95rem; color: rgba(255,255,255,.5); transition: color .15s; }
+.fc ul li a:hover { color: #fff; }
+.fb-bot { display: flex; align-items: center; justify-content: space-between; padding-top: 2rem; flex-wrap: wrap; gap: 1rem; font-size: .875rem; color: rgba(255,255,255,.3); }
+.fb-bot a { color: rgba(255,255,255,.4); }
+.fb-bot a:hover { color: rgba(255,255,255,.75); }
+.fl { display: flex; gap: 1.5rem; }
+.fd { max-width: 1400px; margin: 1.75rem auto 0; padding: 1.1rem 1.4rem; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 9px; font-size: .875rem; line-height: 1.7; color: rgba(255,255,255,.3); }
+.fd strong { color: rgba(255,255,255,.48); }
+ 
+/* ═══════════════════════════════
+   TOAST
+═══════════════════════════════ */
+.toast {
+  position: fixed; bottom: 2.5rem; right: 2.5rem;
+  background: var(--plum); color: #fff;
+  padding: .9rem 1.4rem; border-radius: 12px;
+  font-size: .95rem; font-weight: 500;
+  box-shadow: 0 10px 36px rgba(45,32,80,.4);
+  display: flex; align-items: center; gap: .65rem;
+  transform: translateY(80px); opacity: 0;
+  transition: all .32s cubic-bezier(.4,0,.2,1); z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 2.5; flex-shrink: 0; }
+ 
+/* ═══════════════════════════════
+   RESPONSIVE
+═══════════════════════════════ */
+@media (max-width: 1200px) {
+  .page-inner { grid-template-columns: 270px 1fr; }
+  .sum-row { grid-template-columns: repeat(2, 1fr); }
+  .ft { grid-template-columns: 1fr 1fr; }
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-card { display: none; }
+}
+@media (max-width: 900px) {
+  .page-inner { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  nav.primary-nav { display: none; }
+  .header-inner, .bc-bar, .page-outer { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .hero { padding: 3rem 1.5rem 4rem; }
+  .rg { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .sum-row { grid-template-columns: 1fr 1fr; }
+  .pg-head { flex-direction: column; align-items: flex-start; }
+  .tc-head { flex-direction: column; align-items: flex-start; }
+  .ft { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+ 
+<!-- STRIP -->
+<div class="strip">
+  <strong>Research Preview</strong> — MindfulnessAI PTSD Risk Prediction System v2.1 &nbsp;·&nbsp; 91.2% model accuracy &nbsp;·&nbsp; <a href="/predict">Run a new assessment →</a>
+</div>
+ 
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">Mindfulness<span>AI</span></div>
+        <div class="logo-sub">PTSD Risk System</div>
+      </div>
+    </a>
+ 
+    <nav class="primary-nav" aria-label="Primary navigation">
+      <a class="nav-link" href="#">Dashboard</a>
+      <a class="nav-link active" href="#">Patient Records</a>
+      <a class="nav-link" href="/predict">PTSD Assessment</a>
+      <a class="nav-link" href="#">Reports</a>
+      <a class="nav-link" href="#">Research</a>
+    </nav>
+ 
+    <div class="header-right">
+      <a href="/predict" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        New Assessment
+      </a>
+      <div class="user-chip">
+        <div class="avatar">DC</div>
+        <div>
+          <div class="user-name">Dr. Chen</div>
+          <div class="user-role">Clinical Psychologist</div>
+        </div>
+      </div>
+      <a href="/logout" class="btn btn-ghost" title="Log out">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+ 
+<!-- HERO -->
+<section class="hero" aria-label="Dashboard hero">
+  <div class="hero-blob hb1"></div>
+  <div class="hero-blob hb2"></div>
+  <div class="hero-blob hb3"></div>
+  <div class="hero-inner">
+    <div class="a1">
+      <div class="hero-eyebrow">Clinical AI · PTSD Risk Prediction</div>
+      <h1 class="hero-title">PTSD Risk <em>Assessment</em><br>Dashboard</h1>
+      <p class="hero-desc">An AI-powered clinical decision-support system leveraging machine learning to predict PTSD risk from biometric, trauma-exposure, and lifestyle data. All predictions are explainable via SHAP analysis.</p>
+      <div class="hero-actions">
+        <a href="/predict" class="hero-btn-p">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          New Risk Assessment
+        </a>
+        <a href="#research" class="hero-btn-o">View Research Methodology</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hs-val">91.2<sup>%</sup></div><div class="hs-lbl">Model Accuracy</div></div>
+        <div><div class="hs-val">4</div><div class="hs-lbl">SHAP Features</div></div>
+        <div><div class="hs-val" id="hero-count">—</div><div class="hs-lbl">Total Assessments</div></div>
+        <div><div class="hs-val">ML</div><div class="hs-lbl">Machine Learning</div></div>
+      </div>
+    </div>
+    <div class="a2">
+      <div class="hero-card">
+        <div class="hc-head"><span class="hc-title">Risk Overview</span><span class="live-dot">Live</span></div>
+        <div class="hc-donut"><span class="hc-donut-val" id="hero-avg">—</span></div>
+        <div class="hc-rows">
+          <div class="hc-row"><span class="hc-lbl">High Risk</span><span class="hc-val" id="hc-h">—</span></div>
+          <div class="hc-row"><span class="hc-lbl">Moderate Risk</span><span class="hc-val" id="hc-m">—</span></div>
+          <div class="hc-row"><span class="hc-lbl">Low Risk</span><span class="hc-val" id="hc-l">—</span></div>
+          <div class="hc-row"><span class="hc-lbl">Model Status</span><span class="mpill mpill-g">Active</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- BREADCRUMB -->
+<div class="bc-bar">
+  <ol class="bc" aria-label="Breadcrumb">
+    <li><a href="#">Home</a></li>
+    <li class="bc-sep">›</li>
+    <li><a href="#">Patient Records</a></li>
+    <li class="bc-sep">›</li>
+    <li aria-current="page">PTSD Risk Dashboard</li>
+  </ol>
+</div>
+ 
+<!-- PAGE BODY -->
+<div class="page-outer">
+  <div class="page-inner">
+ 
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" aria-label="Sidebar">
+ 
+      <div class="sc a1">
+        <div class="sc-head">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <h3>Model Performance</h3>
+        </div>
+        <div class="sc-body">
+          <div class="mring-wrap">
+            <div class="mring"><span class="mring-val">91.2%</span></div>
+            <div class="mring-lbl">Overall Accuracy</div>
+            <div class="mring-sub">Random Forest Classifier</div>
+          </div>
+          <div class="mrow"><span class="mrow-n">Precision</span><span class="mrow-v">89.4%</span></div>
+          <div class="mrow"><span class="mrow-n">Recall</span><span class="mrow-v">88.7%</span></div>
+          <div class="mrow"><span class="mrow-n">F1 Score</span><span class="mrow-v">89.0</span></div>
+          <div class="mrow"><span class="mrow-n">AUC-ROC</span><span class="mrow-v">0.942</span></div>
+          <div class="mrow"><span class="mrow-n">SHAP Features</span><span class="mrow-v">4 top</span></div>
+        </div>
+      </div>
+ 
+      <div class="sc a2">
+        <div class="sc-head">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <h3>Risk Distribution</h3>
+        </div>
+        <div class="sc-body">
+          <div class="dist-list">
+            <div>
+              <div class="dist-head"><span class="dist-name">High Risk</span><span class="dist-count" id="sb-h">—</span></div>
+              <div class="dist-track"><div class="dist-fill df-h" id="bar-h" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="dist-head"><span class="dist-name">Moderate Risk</span><span class="dist-count" id="sb-m">—</span></div>
+              <div class="dist-track"><div class="dist-fill df-m" id="bar-m" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="dist-head"><span class="dist-name">Low Risk</span><span class="dist-count" id="sb-l">—</span></div>
+              <div class="dist-track"><div class="dist-fill df-l" id="bar-l" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="info-box a3">
+        <span class="info-tag">Clinical AI Notice</span>
+        <p>All data is processed securely. Predictions are designed to <strong>assist clinical decision-making</strong>, not replace professional judgment. Consult a licensed clinician for final diagnosis.</p>
+      </div>
+ 
+      <div class="sc a4">
+        <div class="sc-head">
+          <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          <h3>Quick Actions</h3>
+        </div>
+        <div class="sc-body" style="padding:.85rem .65rem">
+          <nav class="ql">
+            <a href="/predict" class="ql-a"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>New Assessment</span></a>
+            <a href="#" class="ql-a"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Export Records</span></a>
+            <a href="#" class="ql-a"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>View Reports</span></a>
+            <a href="#" class="ql-a"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Patient Directory</span></a>
+            <a href="/logout" class="ql-a"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Log Out</span></a>
+          </nav>
+        </div>
+      </div>
+ 
+    </aside>
+ 
+    <!-- ── MAIN ── -->
+    <main class="content-area">
+ 
+      <!-- Page heading -->
+      <div class="pg-head a1">
+        <div>
+          <span class="pg-tag">Patient History</span>
+          <h1>PTSD Risk Dashboard</h1>
+          <p class="pg-desc">Complete assessment records with AI-powered risk predictions. All fields are processed securely using our validated machine-learning model.</p>
+        </div>
+        <div class="pg-actions">
+          <a href="#" class="btn btn-outline">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export CSV
+          </a>
+          <a href="/predict" class="btn btn-primary">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            New Prediction
+          </a>
+        </div>
+      </div>
+ 
+      <!-- Summary cards -->
+      <div class="sum-row a2">
+        <div class="sum-card c-tot">
+          <div class="sum-icon i-plum"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <div class="sum-num" id="sc-t">—</div>
+          <div class="sum-lbl">Total Assessments</div>
+          <div class="sum-sub">All time records</div>
+        </div>
+        <div class="sum-card c-hi">
+          <div class="sum-icon i-rose"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg></div>
+          <div class="sum-num" id="sc-h" style="color:var(--rose)">—</div>
+          <div class="sum-lbl">High Risk</div>
+          <div class="sum-sub">Requires immediate attention</div>
+        </div>
+        <div class="sum-card c-me">
+          <div class="sum-icon i-amb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div class="sum-num" id="sc-m" style="color:var(--amber)">—</div>
+          <div class="sum-lbl">Moderate Risk</div>
+          <div class="sum-sub">Monitoring recommended</div>
+        </div>
+        <div class="sum-card c-lo">
+          <div class="sum-icon i-sag"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="sum-num" id="sc-l" style="color:var(--sage)">—</div>
+          <div class="sum-lbl">Low Risk</div>
+          <div class="sum-sub">Within normal range</div>
+        </div>
+      </div>
+ 
+      <!-- Table -->
+      <div class="tc a3">
+        <div class="tc-head">
+          <div class="tc-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Assessment Records</h3>
+            <span class="tc-badge" id="tc-cnt">— entries</span>
+          </div>
+          <div class="tc-actions">
+            <div class="search-box" role="search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search records…" id="search-input" aria-label="Search records"/>
+            </div>
+            <button class="btn btn-outline" style="padding:.5rem 1.1rem;font-size:.9rem" onclick="sortTable()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+              Sort
+            </button>
+          </div>
+        </div>
+ 
+        <div style="overflow-x:auto">
+          <table id="ptsd-table" aria-label="PTSD Assessment Records">
+            <thead>
+              <tr>
+                <th style="width:56px">#</th>
+                <th class="sort" onclick="sortTable('date')">Date ↕</th>
+                <th class="sort" onclick="sortTable('risk')">Risk % ↕</th>
+                <th>Assessment Result</th>
+                <th style="width:100px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+ 
+              {% for row in data %}
+              <tr data-risk="{{ row[0] }}" data-result="{{ row[1] }}" data-date="{{ row[2] }}">
+                <td class="ci">{{ loop.index }}</td>
+                <td class="cd">
+                  <span class="dm">{{ row[2] }}</span>
+                </td>
+                <td>
+                  <div class="rcell">
+                    <span class="rpct {% if row[0]|float >= 70 %}ch{% elif row[0]|float >= 40 %}cm{% else %}cl{% endif %}">
+                      {{ row[0] }}%
+                    </span>
+                    <div class="rbar">
+                      <div class="rbar-fill {% if row[0]|float >= 70 %}bh{% elif row[0]|float >= 40 %}bm{% else %}bl{% endif %}"
+                           <tr>
+                             <td>1</td>
+                            <td>2026-03-28</td>
+                             <td>9.6%</td>
+                             <td><span class="badge badge-low">Low Risk</span></td>
+                            </tr>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge
+                    {%- set r = row[1]|lower -%}
+                    {%- if 'high' in r %} badge-high
+                    {%- elif 'low' in r %} badge-low
+                    {%- else %} badge-medium{%- endif %}">
+                    {{ row[1] }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-acts">
+                    <button class="ib" title="View details"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="ib" title="Download"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5">
+                  <div class="empty">
+                    <div class="empty-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <h3>No assessments yet</h3>
+                    <p>Run your first PTSD risk assessment using the prediction tool. Results will appear here automatically.</p>
+                    <a href="/predict" class="btn btn-primary" style="margin:0 auto">
+                      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                      Start First Assessment
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+ 
+            </tbody>
+          </table>
+        </div>
+ 
+        <div class="tc-foot">
+          <span class="tc-foot-info" id="foot-info">Showing all records</span>
+          <div class="pgn" aria-label="Pagination">
+            <button class="pgn-btn" aria-label="Previous"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="pgn-btn active">1</button>
+            <button class="pgn-btn" aria-label="Next"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Research Section -->
+      <section class="research a4" id="research" aria-labelledby="research-heading">
+        <span class="pg-tag">Research Methodology</span>
+        <h2 id="research-heading" style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:-.02em;margin-top:.3rem">About the Prediction Model</h2>
+        <p class="pg-desc" style="margin-top:.5rem">Based on peer-reviewed clinical AI research. The ML model was trained on validated datasets and uses explainable AI for clinical transparency.</p>
+ 
+        <div class="rg">
+          <div class="rb">
+            <h3><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Model Architecture</h3>
+            <p>A Random Forest classifier trained on multi-modal clinical data including biometric, trauma-exposure, psychiatric, and lifestyle factors. Cross-validated with 5-fold stratified splits.</p>
+            <div class="feat-list">
+              <div class="feat-item">Random Forest (500 estimators)</div>
+              <div class="feat-item">5-fold Stratified Cross-Validation</div>
+              <div class="feat-item">SMOTE oversampling for class balance</div>
+              <div class="feat-item">GridSearchCV hyperparameter tuning</div>
+            </div>
+          </div>
+          <div class="rb">
+            <h3><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Input Features</h3>
+            <p>The model ingests 20+ clinical variables across four domains, selected using SHAP-based feature importance analysis.</p>
+            <div class="feat-list">
+              <div class="feat-item">Vital Parameters (Height, Weight, BMI, Age)</div>
+              <div class="feat-item">Trauma Exposure Events</div>
+              <div class="feat-item">Medical &amp; Psychiatric History</div>
+              <div class="feat-item">Lifestyle &amp; Socioeconomic Factors</div>
+            </div>
+          </div>
+          <div class="rb">
+            <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>SHAP Explainability</h3>
+            <p>SHAP values are computed for every prediction, providing clinicians with interpretable feature attribution scores for full model transparency.</p>
+            <div class="shap-list">
+              <div><div class="shap-head"><span class="shap-name">Psychological Resilience</span><span class="shap-score">0.34</span></div><div class="shap-track"><div class="shap-fill" style="width:85%"></div></div></div>
+              <div><div class="shap-head"><span class="shap-name">Trauma Exposure Score</span><span class="shap-score">0.28</span></div><div class="shap-track"><div class="shap-fill" style="width:70%"></div></div></div>
+              <div><div class="shap-head"><span class="shap-name">Psychiatric History</span><span class="shap-score">0.19</span></div><div class="shap-track"><div class="shap-fill" style="width:48%"></div></div></div>
+              <div><div class="shap-head"><span class="shap-name">Income Level</span><span class="shap-score">0.14</span></div><div class="shap-track"><div class="shap-fill" style="width:35%"></div></div></div>
+            </div>
+          </div>
+          <div class="rb">
+            <h3><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Validation &amp; Ethics</h3>
+            <p>The model was ethically reviewed and validated against independent clinical datasets. Bias audits were performed across demographic subgroups.</p>
+            <div class="feat-list">
+              <div class="feat-item">IRB-approved research protocol</div>
+              <div class="feat-item">Independent test-set AUC: 0.942</div>
+              <div class="feat-item">Demographic parity bias audit</div>
+              <div class="feat-item">HIPAA-compliant data handling</div>
+            </div>
+          </div>
+        </div>
+      </section>
+ 
+    </main>
+  </div>
+</div>
+ 
+<!-- FOOTER -->
+<footer class="sf" aria-label="Site footer">
+  <div class="fi">
+    <div class="ft">
+      <div class="fb">
+        <div class="logo">
+          <div class="logo-mark" style="background:linear-gradient(135deg,var(--plum2),var(--violet))">
+            <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.8"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          </div>
+          <div class="logo-name fb-logo-text">Mindfulness<span>AI</span></div>
+        </div>
+        <p class="fb-tag">An AI-powered clinical decision-support system for PTSD risk prediction. Designed exclusively for healthcare professionals.</p>
+        <span class="fb-badge">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          HIPAA Compliant
+        </span>
+      </div>
+      <div class="fc">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="/predict">New Assessment</a></li>
+          <li><a href="#">Patient Records</a></li>
+          <li><a href="#">Reports</a></li>
+          <li><a href="#">Analytics</a></li>
+        </ul>
+      </div>
+      <div class="fc">
+        <h4>Research</h4>
+        <ul>
+          <li><a href="#">Methodology</a></li>
+          <li><a href="#">Model Card</a></li>
+          <li><a href="#">SHAP Analysis</a></li>
+          <li><a href="#">Publications</a></li>
+          <li><a href="#">Dataset Info</a></li>
+        </ul>
+      </div>
+      <div class="fc">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Clinical Guide</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="/logout">Log Out</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb-bot">
+      <span>© 2024 MindfulnessAI. All rights reserved. PTSD Risk Prediction System v2.1</span>
+      <div class="fl">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="fd">
+    <strong>Medical Disclaimer:</strong> MindfulnessAI is a clinical decision-support tool intended for use by licensed healthcare professionals only. Predictions generated by this system are based on statistical models and are not a substitute for professional clinical judgment, diagnosis, or treatment. All patient data is processed in accordance with applicable healthcare privacy regulations including HIPAA. If you or a patient are experiencing a mental health crisis, please contact a qualified healthcare provider or emergency services immediately.
+  </div>
+</footer>
+ 
+<!-- TOAST -->
+<div class="toast" id="toast" role="alert" aria-live="polite">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg">Done</span>
+</div>
+ 
+<script>
+/* ── Bootstrap stats ── */
+(function () {
+  const rows = Array.from(document.querySelectorAll('#table-body tr[data-risk]'));
+  const n = rows.length;
+  let high = 0, med = 0, low = 0, sum = 0;
+ 
+  rows.forEach(r => {
+    const v = parseFloat(r.dataset.risk) || 0;
+    const res = (r.dataset.result || '').toLowerCase();
+    sum += v;
+    if (res.includes('high')) high++;
+    else if (res.includes('low')) low++;
+    else med++;
+  });
+ 
+  const avg = n ? Math.round(sum / n) : 0;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+ 
+  set('hero-count', n || '—');
+  set('hero-avg',   n ? avg + '%' : '—');
+  set('hc-h', high); set('hc-m', med); set('hc-l', low);
+  set('sc-t', n || '—');
+  set('sc-h', high || '—');
+  set('sc-m', med  || '—');
+  set('sc-l', low  || '—');
+  set('tc-cnt',    n + (n === 1 ? ' entry' : ' entries'));
+  set('foot-info', 'Showing ' + n + ' record' + (n === 1 ? '' : 's'));
+ 
+  if (n) {
+    const pct = (id, c) => { const el = document.getElementById(id); if (el) el.style.width = Math.round(c / n * 100) + '%'; };
+    pct('bar-h', high); pct('bar-m', med); pct('bar-l', low);
+    set('sb-h', high + ' case' + (high !== 1 ? 's' : ''));
+    set('sb-m', med  + ' case' + (med  !== 1 ? 's' : ''));
+    set('sb-l', low  + ' case' + (low  !== 1 ? 's' : ''));
+  }
+})();
+ 
+/* ── Search ── */
+document.getElementById('search-input').addEventListener('input', function () {
+  const q = this.value.toLowerCase().trim();
+  const rows = document.querySelectorAll('#table-body tr[data-risk]');
+  let vis = 0;
+  rows.forEach(r => {
+    const match = r.textContent.toLowerCase().includes(q);
+    r.style.display = match ? '' : 'none';
+    if (match) vis++;
+  });
+  document.getElementById('foot-info').textContent = q
+    ? 'Showing ' + vis + ' of ' + rows.length + ' records'
+    : 'Showing all ' + rows.length + ' records';
+});
+ 
+/* ── Sort ── */
+let sortDir = 1;
+function sortTable(col) {
+  const tbody = document.getElementById('table-body');
+  const rows = Array.from(tbody.querySelectorAll('tr[data-risk]'));
+  rows.sort((a, b) =>
+    col === 'risk'
+      ? sortDir * (parseFloat(a.dataset.risk) - parseFloat(b.dataset.risk))
+      : sortDir * (a.dataset.date || '').localeCompare(b.dataset.date || '')
+  );
+  sortDir *= -1;
+  rows.forEach(r => tbody.appendChild(r));
+}
+ 
+/* ── Toast ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+ 
+document.querySelectorAll('.ib').forEach((btn, i) =>
+  btn.addEventListener('click', () =>
+    showToast(i % 2 === 0 ? 'Opening patient record…' : 'Preparing download…')
+  )
+);
+</script>
+</body>
+</html>
